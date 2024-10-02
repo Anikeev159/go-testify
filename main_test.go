@@ -3,7 +3,6 @@ package main
 import (
 	"net/http"
 	"net/http/httptest"
-	"strconv"
 	"strings"
 	"testing"
 
@@ -11,45 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var cafeList = map[string][]string{
-	"moscow": []string{"Мир кофе", "Сладкоежка", "Кофе и завтраки", "Сытый студент"},
-}
-
-func mainHandle(w http.ResponseWriter, req *http.Request) {
-	countStr := req.URL.Query().Get("count")
-	if countStr == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("count missing"))
-		return
-	}
-
-	count, err := strconv.Atoi(countStr)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("wrong count value"))
-		return
-	}
-
-	city := req.URL.Query().Get("city")
-
-	cafe, ok := cafeList[city]
-	if !ok {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("wrong city value"))
-		return
-	}
-
-	if count > len(cafe) {
-		count = len(cafe)
-	}
-
-	answer := strings.Join(cafe[:count], ",")
-
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(answer))
-}
-
-func TestMainHandlerWhenCountMoreThanTotal(t *testing.T) {
+func Test_MainHandlerWhenCountMoreThanTotal(t *testing.T) {
 	totalCount := 4
 	req, err := http.NewRequest(http.MethodGet, "/cafe?count=5&city=moscow", nil)
 	require.NoError(t, err)
@@ -63,7 +24,7 @@ func TestMainHandlerWhenCountMoreThanTotal(t *testing.T) {
 	assert.Equal(t, totalCount, len(strings.Split(responseRecorder.Body.String(), ",")))
 }
 
-func TestMainHandlerWhenCityWrong(t *testing.T) {
+func Test_MainHandlerWhenCityWrong(t *testing.T) {
 	req, err := http.NewRequest(http.MethodGet, "/cafe?count=2&city=london", nil)
 	require.NoError(t, err)
 
@@ -75,7 +36,7 @@ func TestMainHandlerWhenCityWrong(t *testing.T) {
 	assert.Equal(t, "wrong city value", responseRecorder.Body.String())
 }
 
-func TestMainHandlerWhenRequestCorrect(t *testing.T) {
+func Test_MainHandlerWhenRequestCorrect(t *testing.T) {
 	req, err := http.NewRequest(http.MethodGet, "/cafe?count=2&city=moscow", nil)
 	require.NoError(t, err)
 
