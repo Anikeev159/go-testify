@@ -19,9 +19,8 @@ func Test_MainHandlerWhenCountMoreThanTotal(t *testing.T) {
 	handler := http.HandlerFunc(mainHandle)
 	handler.ServeHTTP(responseRecorder, req)
 
-	assert.Equal(t, http.StatusOK, responseRecorder.Code)
-	assert.NotEmpty(t, responseRecorder.Body.String())
-	assert.Equal(t, totalCount, len(strings.Split(responseRecorder.Body.String(), ",")))
+	require.Equal(t, http.StatusOK, responseRecorder.Code)
+	assert.Len(t, strings.Split(responseRecorder.Body.String(), ","), totalCount)
 }
 
 func Test_MainHandlerWhenCityWrong(t *testing.T) {
@@ -32,8 +31,8 @@ func Test_MainHandlerWhenCityWrong(t *testing.T) {
 	handler := http.HandlerFunc(mainHandle)
 	handler.ServeHTTP(responseRecorder, req)
 
-	assert.Equal(t, http.StatusBadRequest, responseRecorder.Code)
-	assert.Equal(t, "wrong city value", responseRecorder.Body.String())
+	require.Equal(t, http.StatusBadRequest, responseRecorder.Code)
+	require.Equal(t, "wrong city value", responseRecorder.Body.String())
 }
 
 func Test_MainHandlerWhenRequestCorrect(t *testing.T) {
@@ -44,6 +43,6 @@ func Test_MainHandlerWhenRequestCorrect(t *testing.T) {
 	handler := http.HandlerFunc(mainHandle)
 	handler.ServeHTTP(responseRecorder, req)
 
-	assert.Equal(t, http.StatusOK, responseRecorder.Code)
-	assert.NotEmpty(t, responseRecorder.Body.String())
+	require.Equal(t, http.StatusOK, responseRecorder.Code)
+	assert.NotEmpty(t, responseRecorder.Body)
 }
